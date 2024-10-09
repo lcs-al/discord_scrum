@@ -10,7 +10,7 @@ module.exports = {
             await interaction.reply({ content: "Wasn't find the voice channel where you are connected in", fetchReply: true });
             return
         }
-        console.log('oi')
+
         if(!client.isDailyRunning) return await interaction.reply({ content: "There's no daily meeting occurring right now to be finished", fetchReply: true })
         return await interaction.reply({ content: "The current daily meeting has been finished ✅", fetchReply: true })
 	},
