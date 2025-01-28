@@ -11,7 +11,7 @@
   "author": "Lucas",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/rest": "^1.0.1",
+    "@discordjs/rest": "^1.7.1",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "discord.js": "^14.2.0",
