@@ -6,4 +6,4 @@ RUN npm install
 COPY . .
 RUN node deploy-commands.js
 
-CMD [ "node", "index.js" ]g
+CMD [ "npm", "start" ]
