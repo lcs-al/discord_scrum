@@ -1,34 +1,86 @@
-# Discord Bot Volléria
+# Discord Scrum Bot
 
-Is a Discord bot to help us keep the control of our scrum rituals.
+A Discord bot designed to assist engineering teams with Scrum processes, daily meetings, and CI/CD notifications.
 
-## Installation
+## 🤖 Slash Commands
 
-Use the package manager [npm/yarn] to install all required packages and dependencies of the project.
+### Management
+- **/devs list**
+  - Displays a list of all developers registered in the database (User + Nickname).
+- **/devs set `user` `nickname`**
+  - Associates a Discord User with a specific nickname (used for accurate notifications from Jira/Bitbucket).
+- **/devs remove `user`**
+  - Removes a developer from the registry.
 
-```bash
-npm install --save
-```
-or 
+### Notifications Configuration
+- **/set_ticket_channel `channel`**
+  - Sets the text channel where **new Jira ticket** notifications will be posted.
+- **/set_deploy_channel `channel`**
+  - Sets the text channel where **build and deploy status** updates will be posted.
 
-```bash
-yarn add
-```
+### Productivity Tools
+- **/links add `key` `url`**
+  - Saves a useful link with a quick-access key.
+- **/links show `key`**
+  - Retrieves a specific link.
+- **/links show_all**
+  - Lists all saved links for the server.
+- **/links delete `key`**
+  - Removes a saved link.
+- **/whos_missing**
+  - Compares users in the text channel vs voice channel to see who is missing from the Daily.
+- **/finish_daily**
+  - Marks the current daily meeting as finished.
+- **/setup_daily**
+  - Configures the Daily meeting settings.
 
-## Usage
-Once you already have all requirements of the project you need to create an .jon file called 'config.json' to pass some environments variables. Will be something like:
+---
 
-```
-{
-    "CLIENT_ID": "XXXXXXXXX", # your bot client's id, you can get this one on discord developers page in the tab "Application"
-    "token": "XXXXXXXXX", # your bot secrets token also can get this one on discord developers page
-}
-```
+## 🔌 API Endpoints
 
-After this you just need to be sure to run the deploy-commads.js before the actual application, you can simple run:
+The bot exposes an HTTP server (default port 3000) to receive webhooks from external tools (Jira, Bitbucket, CI Pipelines).
 
-```bash
-    node deploy-commands.js
-```
+### 1. Ticket Notifications
+**POST** `/ticket`
+- **Source**: Jira Automation / Webhook.
+- **Payload**: Standard Jira Issue JSON.
+- **Action**: Sends a rich embed to the configured Ticket Channel.
 
-and it's everything up to use the bot!.
+### 2. Comment Notifications
+**POST** `/comment/pullrequest`
+- **Source**: Bitbucket / Jira Webhook.
+- **Payload**: Comment payload containing author and PR details.
+- **Action**: Lookups the Discord user via the registered **Nickname** (from `/devs`) and sends a Direct Message (DM).
+
+### 3. Build & Deploy Status
+**POST** `/build_status`
+- **Source**: CI/CD Pipeline (e.g., Bitbucket Pipelines, Jenkins).
+- **Payload**: JSON with `state` ('SUCCESSFUL' or 'FAILED'), `repository`, `commit`, etc.
+- **Action**: Sends a status embed to the configured Deploy Channel.
+
+### 4. General Alerts
+**POST** `/alert`
+- **Source**: External monitoring tools.
+- **Action**: Sends a general alert message.
+
+## 🛠️ Setup
+
+1. **Environment Variables**:
+   Create a `.env` file with:
+   ```env
+   DISCORD_TOKEN=your_token
+   CLIENT_ID=your_client_id
+   DATA_BASE_URL=your_firebase_url
+   PORT=3000
+   ```
+
+2. **Register Commands**:
+   Run the deployment script to register slash commands in your guild:
+   ```bash
+   node src/deploy-commands.js
+   ```
+
+3. **Start Bot**:
+   ```bash
+   npm start
+   ```
