@@ -36,6 +36,6 @@ module.exports = {
         var attendance_message = 'Everybody is present on the voice call! 😉'
         var message_content = missing_list.length > 0 ? missing_message : attendance_message
         
-		const message = await interaction.reply({ content: message_content, fetchReply: true });
+		await interaction.reply({ content: message_content, fetchReply: true });
 	},
 };
