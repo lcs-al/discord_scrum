@@ -1,113 +1,126 @@
-const Client = require('../../utils/client');
-const devs = require("../../../assets/devs.json");
+const Client = require("../../utils/client");
+const axios = require("axios");
+const { DATA_BASE_URL } = process.env;
+
+const db = axios.create({
+  baseURL: DATA_BASE_URL,
+});
 
 class CommentService {
   constructor() {
     this.createClient();
-    this.devs = devs;
   }
 
   async createClient() {
-    const client = await Client.getClient();
-    this.client = client;
-
-    const guild = await client.guilds.fetch('740596666955989042');
-    const channel = await guild.channels.fetch('979389580551790652');
-    const members = channel.members.map(({user: { username, id }}) => ({ username, id }));
-
-    this.members = members;
+    this.client = await Client.getClient();
   }
 
-  findDiscordId(name) {
-    const user = this.devs.find((user) => user.name === name);
-    return user;
+  async findDiscordUserByNickname(nickname) {
+    if (!nickname) return null;
+
+    try {
+      if (!this.client) await this.createClient();
+
+      const guild = this.client.guilds.cache.first();
+      if (!guild) {
+        console.error("Bot is not in any guild! Cannot lookup devs.");
+        return null;
+      }
+
+      const res = await db.get(`/devs/${guild.id}.json`);
+      const devs = res.data; // Object: { "userId": { email, id } } or null
+      if (!devs) return null;
+      const devEntry = Object.values(devs).find(
+        (dev) =>
+          dev.nickname && dev.nickname.toLowerCase() === nickname.toLowerCase(),
+      );
+
+      if (devEntry && devEntry.id) {
+        return await this.client.users.fetch(devEntry.id);
+      }
+    } catch (error) {
+      console.error("Error looking up user by email:", error);
+    }
+    return null;
   }
 
   async sendMessage(data) {
-    const { 
+    const { EmbedBuilder } = require("discord.js");
+    const {
       comment_author,
       pullrequest_title,
       pullrequest_key,
       discord_user,
       comment,
-      link
+      link,
     } = data;
 
-    const content = `
-💬 Novo comentario de **${comment_author}** em **${pullrequest_title} | ${pullrequest_key}**
+    const embed = new EmbedBuilder()
+      .setColor(0x0099ff)
+      .setTitle(`💬 Novo comentário em: ${pullrequest_title}`)
+      .setURL(link)
+      .setAuthor({ name: comment_author })
+      .setDescription(
+        comment.length > 2000 ? comment.substring(0, 1997) + "..." : comment,
+      )
+      .addFields(
+        { name: "PR/Issue", value: `${pullrequest_key}`, inline: true },
+        { name: "Link", value: `[Acessar](${link})`, inline: true },
+      )
+      .setTimestamp();
 
-**${comment_author}** 🗣️: "${comment}"
+    const content = {
+      content: `Olá <@${discord_user.id}>, você recebeu um novo comentário!`,
+      embeds: [embed],
+    };
 
-🔗 Link: ${link}
-    `.trim();
+    try {
+      await discord_user.send(content);
+    } catch (error) {
+      console.error(`Failed to send DM to user ${discord_user?.id}:`, error);
+    }
 
-    const user = await this.client.users.fetch(discord_user.id);
-    user.send(content)
-
-    return content;
-  }
-
-  async create_issue(data) {
-    const { 
-      issue: { 
-        key: pullrequest_key,
-        fields: { 
-          summary: pullrequest_title,
-          assignee: { displayName: pullrequest_owner, accountId } 
-        }
-      },
-      comment: {
-        author: { displayName: comment_author },
-        body: comment
-      }
-    } = data;
-
-    const discord_user = this.findDiscordId(pullrequest_owner);
-    if (!discord_user) return;
-
-    const link = `https://vollsolutions.atlassian.net/jira/software/projects/V2/boards/30?assignee=${accountId}&selectedIssue=${pullrequest_key}`;
-
-    const content = await this.sendMessage({ 
-      pullrequest_title,
-      pullrequest_key,
-      comment_author,
-      comment,
-      discord_user,
-      link
-    });
-
-    return content;
+    return "Message sent";
   }
 
   async create_pullrequest(data) {
-    const { 
-      repository: { uuid: repo_id },
-      pullrequest: { 
-        id: pullrequest_id, 
+    const {
+      repository: { full_name: full_name },
+      pullrequest: {
+        id: pullrequest_id,
         title: pullrequest_title,
-        title: pullrequest_key,
-        author: { nickname: pullrequest_owner }
+        author, // author object
       },
-      comment: { content: { raw: comment } },
-      actor: { display_name: comment_author }
+      comment: {
+        content: { raw: comment },
+      },
+      actor: { display_name: comment_author },
     } = data;
 
-    const discord_user = this.findDiscordId(pullrequest_owner);
-    if (!discord_user) return;
-    const link = `https://bitbucket.org/callsave/${repo_id}/pull-requests/${pullrequest_id}`;
-    
-    const content = await this.sendMessage({ 
+    const discord_user = await this.findDiscordUserByNickname(
+      author.display_name,
+    );
+
+    if (!discord_user) {
+      console.log(`User not registered for nickname: ${author.display_name}`);
+      return {
+        error: `User not registered for nickname: ${author.display_name}`,
+      };
+    }
+
+    const link = `https://bitbucket.org/${full_name}/pull-requests/${pullrequest_id}`;
+
+    const content = await this.sendMessage({
       pullrequest_title,
-      pullrequest_key,
+      pullrequest_key: pullrequest_title,
       comment_author,
       comment,
       discord_user,
-      link
+      link,
     });
 
     return content;
   }
-
 }
 
 module.exports = CommentService;

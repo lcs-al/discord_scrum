@@ -8,9 +8,4 @@ router
   .route('/pullrequest')
   .post((req, res) => comment.create_pullrequest(req, res))
 
-
-router
-  .route('/issue')
-  .post((req, res) => comment.create_issue(req, res))
-
 module.exports = router;
