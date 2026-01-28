@@ -1,10 +1,10 @@
-const { CLIENT_TOKEN } = require('../config.json');
-const { Client } = require('discord.js');
+const { CLIENT_TOKEN } = process.env;
+const { Client } = require("discord.js");
 
 class DiscordClient {
   async createClient() {
     const client = new Client({ intents: 32767 });
-	  await client.login(CLIENT_TOKEN);
+    await client.login(CLIENT_TOKEN);
 
     return client;
   }

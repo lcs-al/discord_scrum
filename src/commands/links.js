@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios')
-const { DATA_BASE_URL } = require('../config.json');
+const { DATA_BASE_URL } = process.env;
 
 const instance = axios.create({
     baseURL: DATA_BASE_URL

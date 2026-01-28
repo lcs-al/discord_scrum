@@ -1,5 +1,5 @@
 const Client = require('../../utils/client');
-const devs = require('../../assets/devs.json');
+const devs = require("../../../assets/devs.json");
 
 class CommentService {
   constructor() {
