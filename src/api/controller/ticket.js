@@ -7,14 +7,12 @@ class Ticket {
 
   create(req, res) {
     try {
-      const {key, fields} = req.body.issue;
+      this.service.create(req.body);
 
-      this.service.create({ key, fields });
-      
-      res.status(200).json({ message: 'Ticket created!' });
+      res.status(200).json({ message: "Ticket created!" });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ error: 'bad request' });
+      res.status(400).json({ error: "bad request" });
     }
   }
 }
