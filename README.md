@@ -17,6 +17,8 @@ A Discord bot designed to assist engineering teams with Scrum processes, daily m
   - Sets the text channel where **new Jira ticket** notifications will be posted.
 - **/set_deploy_channel `channel`**
   - Sets the text channel where **build and deploy status** updates will be posted.
+- **/set_release_channel `channel`**
+  - Sets the text channel where **release notes** will be posted.
 
 ### Productivity Tools
 - **/links add `key` `url`**
@@ -58,7 +60,13 @@ The bot exposes an HTTP server (default port 3000) to receive webhooks from exte
 - **Payload**: JSON with `state` ('SUCCESSFUL' or 'FAILED'), `repository`, `commit`, etc.
 - **Action**: Sends a status embed to the configured Deploy Channel.
 
-### 4. General Alerts
+### 4. Release Notes
+**POST** `/release`
+- **Source**: Release Pipeline / Script.
+- **Payload**: JSON `{ version, total, issues: [{ type, key, title }] }`.
+- **Action**: Groups issues by type and sends a formatted Release Note embed to the configured Release Channel.
+
+### 5. General Alerts
 **POST** `/alert`
 - **Source**: External monitoring tools.
 - **Action**: Sends a general alert message.
@@ -72,6 +80,7 @@ The bot exposes an HTTP server (default port 3000) to receive webhooks from exte
    CLIENT_ID=your_client_id
    DATA_BASE_URL=your_firebase_url
    PORT=3000
+   JIRA_URL=your_jira_url
    ```
 
 2. **Register Commands**:
