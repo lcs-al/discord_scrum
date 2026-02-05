@@ -99,12 +99,19 @@ class ReleaseService {
     const URL = `${JIRA_URL}/projects/${data.project.key}/versions/${data.id}/tab/release-report-all-issues`
 
     const embed = new EmbedBuilder()
-        .setTitle(`🚀 Release Notes: ${data.version}`)
-        .setURL(URL)
-        .setDescription(`Tarefas subindo: ${data.total}`)
-        .setColor(0x2ecc71) // Green
-        .addFields(fields)
-        .setTimestamp();
+      .setTitle(`🚀 Release Notes: ${data.version}`)
+      .setAuthor({
+        name: data.initiator.name,
+        iconURL:
+          data.initiator.profile_picture.match(/48x48=([^,]+)/)?.[1] ||
+          data.initiator.profile_picture,
+      })
+      .setURL(URL)
+      .setDescription(`Tarefas subindo: ${data.total}`)
+      .setColor(0x2ecc71) // Green
+      .addFields(fields)
+      .setThumbnail(process.env.EMBEDED_THUMBNAIL_URL)
+      .setTimestamp();
 
     await channel.send({ embeds: [embed] });
     return { status: "sent" };

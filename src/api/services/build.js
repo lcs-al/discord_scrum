@@ -85,6 +85,7 @@ class BuildService {
         if (isRelease) {
           // Critical Release Failure
           embed = {
+            url: data.url,
             title: `🚨 FALHA CRÍTICA EM DEPLOY DE PRODUÇÃO 🚨`,
             description: `O deploy da release **${branch}** falhou! Verifique imediatamente. @here`,
             color: 0xff0000, // Red
@@ -97,6 +98,7 @@ class BuildService {
         } else {
           // Master Failure
           embed = {
+            url: data.url,
             description: `🚨 MASTER do ${data.repository.name} quebrou! 🚨 @here`,
             color: 15548997,
             fields,
@@ -114,6 +116,7 @@ class BuildService {
       } else if (isSuccess) {
         // Success (Same for Master/Release)
         embed = {
+          url: data.url,
           description: `✅ ${branch} do ${data.repository.name} tá top! ✅`,
           color: 5763719,
           fields,
@@ -144,6 +147,7 @@ class BuildService {
       if (discordUser) {
         const embed = {
           title: `❌ Falha no Pipeline: ${branch}`,
+          url: data.url,
           description: `O pipeline da sua branch **${branch}** falhou.`,
           color: 15548997,
           fields: [
