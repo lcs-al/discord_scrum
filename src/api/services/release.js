@@ -78,7 +78,9 @@ class ReleaseService {
     order.forEach(key => {
         if (grouped[key]) {
             const issues = grouped[key];
-            const issueText = issues.map(i => `${i.key}︱${i.title}`).join('\n');
+            const issueText = issues
+              .map((i) => `[${i.key}](${i.url})︱${i.title}`)
+              .join("\n");
             fields.push({ name: key, value: issueText });
             delete grouped[key];
         }
@@ -88,7 +90,9 @@ class ReleaseService {
     // Safe fallback just in case
     Object.keys(grouped).forEach(key => {
         const issues = grouped[key];
-        const issueText = issues.map(i => `${i.key}︱${i.title}`).join('\n');
+        const issueText = issues
+          .map((i) => `[${i.key}](${i.url})︱${i.title}`)
+          .join("\n");
         fields.push({ name: key, value: issueText });
     });
 

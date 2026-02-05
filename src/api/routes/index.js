@@ -5,11 +5,13 @@ const comment = require('./comment');
 const alert = require('./alert');
 const build = require('./build');
 const release = require("./release");
+const aws = require("./aws_sns");
 
 router.use('/ticket', ticket);
 router.use('/comment', comment);
 router.use('/alert', alert);
 router.use('/build_status', build);
 router.use("/release", release);
+router.use('/aws', aws);
 
 module.exports = router;
