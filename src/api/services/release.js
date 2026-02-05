@@ -110,7 +110,7 @@ class ReleaseService {
       .setDescription(`Tarefas subindo: ${data.total}`)
       .setColor(0x2ecc71) // Green
       .addFields(fields)
-      .setThumbnail(process.env.EMBEDED_THUMBNAIL_URL)
+      .setThumbnail(process.env.EMBED_THUMBNAIL_URL)
       .setTimestamp();
 
     await channel.send({ embeds: [embed] });
