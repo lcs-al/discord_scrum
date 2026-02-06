@@ -19,6 +19,8 @@ A Discord bot designed to assist engineering teams with Scrum processes, daily m
   - Sets the text channel where **build and deploy status** updates will be posted.
 - **/set_release_channel `channel`**
   - Sets the text channel where **release notes** will be posted.
+- **/setup_alarms_channel**
+  - Sets the current text channel as the destination for **AWS SNS Alarms**.
 
 ### Productivity Tools
 - **/links add `key` `url`**
@@ -70,6 +72,14 @@ The bot exposes an HTTP server (default port 3000) to receive webhooks from exte
 **POST** `/alert`
 - **Source**: External monitoring tools.
 - **Action**: Sends a general alert message.
+
+### 6. AWS SNS Alarms
+**POST** `/aws/alarms`
+- **Source**: AWS Simple Notification Service (SNS).
+- **Supports**: `SubscriptionConfirmation` and `Notification` types.
+- **Action**:
+  - **Confirmation**: Sends a clickable confirmation link to the configured Alarms Channel.
+  - **Notification**: Sends a Red Alert Embed with the alarm subject and message.
 
 ## 🛠️ Setup
 
