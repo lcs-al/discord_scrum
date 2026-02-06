@@ -7,8 +7,12 @@ module.exports = {
       "Show the users that haven't joined in the voice channel yet",
     ),
   async execute(interaction) {
-    var channel_id = interaction.channelId;
-    var channel = interaction.client.channels.cache.get(channel_id);
+    if (
+      interaction.guild.memberCount !== interaction.guild.members.cache.size
+    ) {
+      await interaction.guild.members.fetch();
+    }
+    var channel = interaction.channel;
 
     var only_users = channel.members.filter((member) => !member.user.bot);
     var channel_members = only_users.map((e) => {

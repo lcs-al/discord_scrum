@@ -6,14 +6,15 @@ const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 const server = require('./api/index');
 
 // Create Client
-const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageReactions
-    ],
-    partials: [Partials.Message, Partials.Channel, Partials.Reaction]
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMembers,
+  ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
 // Load Commands
